@@ -1,0 +1,70 @@
+#include <IRremote.h> // add IR remote library
+#include <Servo.h> // add servo motor library
+Servo servo1;
+int IRpin = 12;   // pin for the IR sensor
+int motor_angle=0;
+IRrecv irrecv(IRpin);
+decode_results results;
+void setup()
+{
+Serial.begin(9600); // initialize serial communication
+Serial.println("IR Remote controlled servo motor"); // display message
+irrecv.enableIRIn();  // Start the receiver
+servo1.attach(5); // declare servo motor pin
+servo1.write(motor_angle); // move the motor to 0 deg
+Serial.println("Servo motor angle 0 deg");
+delay(2000);
+}
+void loop()
+{
+while(!(irrecv.decode(&results))); // wait until no button is pressed
+if (irrecv.decode(&results)) // when button is pressed and code is received
+{
+if(results.value==2210)  // check if digit 1 button is pressed
+{
+Serial.println("servo motor angle 30 deg");
+motor_angle = 30;
+servo1.write(motor_angle); // move the motor to 30 deg
+}
+else if(results.value==6308) // if digit 2 button is pressed
+{
+Serial.println("servo motor angle 60 deg");
+motor_angle = 60;
+servo1.write(motor_angle); // move the motor to 60 deg
+}
+else if(results.value==2215) // like wise for all  digit buttons
+{
+Serial.println("servo motor angle 90 deg");
+motor_angle = 90;
+servo1.write(motor_angle);
+}
+else if(results.value==6312)
+{
+Serial.println("servo motor angle 120 deg");
+motor_angle = 120;
+servo1.write(motor_angle);
+}
+else if(results.value==2219)
+{
+Serial.println("servo motor angle 150 deg");
+motor_angle = 150;
+servo1.write(motor_angle);
+}
+else if(results.value==6338) // if volume UP button is pressed
+{
+if(motor_angle<150) motor_angle+=5; // increase motor angle
+Serial.print("Motor angle is ");
+Serial.println(motor_angle);
+servo1.write(motor_angle);         // and move the motor to that angle
+}
+else if(results.value==6292)  // if volume down button is pressed
+{
+if(motor_angle>0) motor_angle-=5; // decrease motor angle
+Serial.print("Motor angle is ");
+Serial.println(motor_angle);
+servo1.write(motor_angle);      // and move the motor to that angle
+}
+delay(200);      // wait for 0.2 sec
+irrecv.resume();     // again be ready to receive next code
+}
+}
